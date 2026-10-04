@@ -1,6 +1,5 @@
 const video = document.getElementById("camera")
 const canvas = document.getElementById("canvas")
-const btnClear = document.getElementById("btnClear")
 const draw = canvas.getContext("2d")
 
 // resize canvas so that it is the same size as it appears on the screen
@@ -156,6 +155,11 @@ hands.onResults(function(results) {
 
     const eraser = fingerIsUp && middleFingerIsUp
 
+    // use middle finger to clear/reset
+    if(middleFingerIsUp && !fingerIsUp){
+        draw.clearRect(0, 0, canvas.width, canvas.height)
+    }
+
     // MediaPipe coords. into Canvas coords
     const x = (1 - fingerTip.x) * canvas.width
     const y = fingerTip.y * canvas.height
@@ -223,9 +227,3 @@ const camera = new Camera(video, {
 })
 
 camera.start()
-
-// clear button
-
-btnClear.addEventListener("click", function() {
-    draw.clearRect(0, 0, canvas.width, canvas.height)
-})
