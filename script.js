@@ -1,5 +1,6 @@
 const video = document.getElementById("camera")
 const canvas = document.getElementById("canvas")
+const btnClear = document.getElementById("btnClear")
 const draw = canvas.getContext("2d")
 
 // resize canvas so that it is the same size as it appears on the screen
@@ -144,13 +145,16 @@ hands.onResults(function(results) {
     }
 
     const hand = results.multiHandLandmarks[0]
+    // index finger
     const fingerTip = hand[8]
-
-    console.log("fingerX:", fingerTip.x, "fingerY:", fingerTip.y, "canvasWidth:", canvas.width, "canvasHeight:", canvas.height, "video:", video.videoWidth, video.videoHeight, "videoClient:", video.clientWidth, video.clientHeight)
-
     const joint = hand[6]
     const fingerIsUp = fingerTip.y < joint.y
-    //console.log("finger is Up:", fingerIsUp)
+    // middle finger
+    const middleFingerTip = hand[12]
+    const middleJoint = hand[10]
+    const middleFingerIsUp = middleFingerTip.y < middleJoint.y
+
+    const eraser = fingerIsUp && middleFingerIsUp
 
     // MediaPipe coords. into Canvas coords
     const x = (1 - fingerTip.x) * canvas.width
@@ -182,9 +186,15 @@ hands.onResults(function(results) {
 
     // drawing settings
 
-    draw.strokeStyle = "red"
-    draw.lineWidth = 5
-    draw.lineCap = "round"
+    if(eraser) {
+        draw.globalCompositeOperation = "destination-out"
+        draw.lineWidth = 30
+    }else {
+        draw.globalCompositeOperation = "source-over"
+        draw.strokeStyle = "red"
+        draw.lineWidth = 5
+        draw.lineCap = "round"
+    }
 
     // drawing from previous position to the current position
 
@@ -213,3 +223,9 @@ const camera = new Camera(video, {
 })
 
 camera.start()
+
+// clear button
+
+btnClear.addEventListener("click", function() {
+    draw.clearRect(0, 0, canvas.width, canvas.height)
+})
