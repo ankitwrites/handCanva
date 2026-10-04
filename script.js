@@ -145,6 +145,9 @@ hands.onResults(function(results) {
 
     const hand = results.multiHandLandmarks[0]
     const fingerTip = hand[8]
+
+    console.log("fingerX:", fingerTip.x, "fingerY:", fingerTip.y, "canvasWidth:", canvas.width, "canvasHeight:", canvas.height, "video:", video.videoWidth, video.videoHeight, "videoClient:", video.clientWidth, video.clientHeight)
+
     const joint = hand[6]
     const fingerIsUp = fingerTip.y < joint.y
     //console.log("finger is Up:", fingerIsUp)
