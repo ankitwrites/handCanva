@@ -2,6 +2,11 @@ const video = document.getElementById("camera")
 const canvas = document.getElementById("canvas")
 const draw = canvas.getContext("2d")
 
+// initialize different colors
+const colors = ["black", "white", "red", "green", "blue"]
+let colorIndex = 0
+let currentColor = colors[colorIndex]
+
 // resize canvas so that it is the same size as it appears on the screen
 
 canvas.width = canvas.clientWidth
@@ -27,7 +32,10 @@ draw.fill() */
 
 // draw a circle wherever the cursor moves
 
-let isDrawing = false
+//let isDrawing = false
+
+// using little finger to change the color
+let previousLittleIsUp = false;
 
 // previous position of the mouse
 
@@ -152,7 +160,23 @@ hands.onResults(function(results) {
     const middleFingerTip = hand[12]
     const middleJoint = hand[10]
     const middleFingerIsUp = middleFingerTip.y < middleJoint.y
+    // little Finger
+    const littleTip = hand[20]
+    const littleJoint = hand[18]
+    const littleIsUp = littleTip.y < littleJoint.y
 
+    // using little to change the color
+    if(littleIsUp && !previouslittleIsUp){
+        colorIndex++;
+        if(colorIndex >= colors.length){
+            colorIndex = 0
+        }
+        currentColor = colors[colorIndex]
+    }
+
+    previouslittleIsUp = littleIsUp
+
+    // eraser mode
     const eraser = fingerIsUp && middleFingerIsUp
 
     // use middle finger to clear/reset
@@ -195,7 +219,7 @@ hands.onResults(function(results) {
         draw.lineWidth = 30
     }else {
         draw.globalCompositeOperation = "source-over"
-        draw.strokeStyle = "red"
+        draw.strokeStyle = currentColor
         draw.lineWidth = 5
         draw.lineCap = "round"
     }
