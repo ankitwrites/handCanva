@@ -34,6 +34,11 @@ let isDrawing = false
 let lastX = null
 let lastY = null
 
+// for smoothing
+let smoothX = null
+let smoothY = null
+
+/*
 // mouse button is pressed
 canvas.addEventListener("mousedown", function(event) {
     isDrawing = true
@@ -93,6 +98,7 @@ canvas.addEventListener("mousemove", function(event) {
     lastX = x
     lastY = y
 })
+*/
 
 // MediaPipe hands
 
@@ -132,6 +138,8 @@ hands.onResults(function(results) {
     if(results.multiHandLandmarks.length === 0){
         lastX = null
         lastY = null
+        smoothX = null
+        smoothY = null
         return
     }
 
@@ -145,9 +153,21 @@ hands.onResults(function(results) {
     const x = (1 - fingerTip.x) * canvas.width
     const y = fingerTip.y * canvas.height
 
+    const smoothing = 0.7
+
+    if(smoothX === null){
+        smoothX = x
+        smoothY = y
+    }else {
+        smoothX = smoothX * smoothing + x * (1 - smoothing)
+        smoothY = smoothY * smoothing + y * (1 - smoothing)
+    }
+
     if(!fingerIsUp){
         lastX = null
         lastY = null
+        smoothX = null
+        smoothY = null
         return
     }
 
@@ -167,12 +187,12 @@ hands.onResults(function(results) {
 
     draw.beginPath()
     draw.moveTo(lastX, lastY)
-    draw.lineTo(x, y)
+    draw.lineTo(smoothX, smoothY)
     draw.stroke()
 
     // make the current position the previous position
-    lastX = x
-    lastY = y
+    lastX = smoothX
+    lastY = smoothY
     
 })
 
